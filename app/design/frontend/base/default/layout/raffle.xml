@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <default>
+        <reference name="top.links">
+            <block type="raffle/raffle" name="raffle.toplink" >
+                <action method="addToTopLink" />
+            </block>
+        </reference>
+    </default>
+    <raffle_index_index>
+		<reference name="head">
+            <action method="addJs">
+                <script>magestore/raffle/raffle.js</script>
+            </action>
+             <action method="addCss">
+                <styleSheet>css/magestore/raffle/raffle.css</styleSheet>
+            </action>
+        </reference>
+        <reference name="root">
+            <action method="setTemplate">
+                <template>page/2columns-left.phtml</template>
+            </action>
+        </reference>
+		<reference name="before_body_end">
+            <block type="raffle/raffle" name="raffle.login" template="raffle/login.phtml" />
+        </reference>
+        <update handle="catalog_category_view" />
+        <update handle="catalog_category_layered" />
+    </raffle_index_index>
+	<catalog_product_view>
+        <reference name="before_body_end">
+            <block type="raffle/raffle" name="raffle.login" template="raffle/product_view_login.phtml" />
+        </reference>
+    </catalog_product_view>
+	<customer_account>
+            <reference name="customer_account_navigation" before="-" template="customer/account/navigation.phtml">
+                <action method="addLink" translate="label" module="customer">
+                    <name>bid</name>
+                    <path>raffle/index/tickets</path>
+                    <label>Raffle Tickets</label>
+                </action>
+            </reference>	
+	</customer_account>
+	<raffle_index_tickets> 
+		<reference name="head">
+            <action method="addJs">
+                <script>magestore/raffle/popup.js</script>
+            </action>
+             <action method="addCss">
+                <styleSheet>css/magestore/raffle/tickets.css</styleSheet>
+            </action>
+        </reference>
+        <reference name="root">
+            <action method="setTemplate">
+                <template>page/1column.phtml</template>
+            </action>
+        </reference>
+		<reference name="content">
+            <block type="raffle/raffle" name="raffle.tickets" template="raffle/tickets.phtml" />
+        </reference>
+    </raffle_index_tickets>
+	<raffle_index_finished> 
+		<reference name="head">
+            <action method="addJs">
+                <script>magestore/raffle/finished.js</script>
+            </action>
+             <action method="addCss">
+                <styleSheet>css/magestore/raffle/finished.css</styleSheet>
+            </action>
+        </reference>
+        <reference name="root">
+            <action method="setTemplate">
+                <template>page/1column.phtml</template>
+            </action>
+        </reference>
+		<reference name="content">
+            <block type="raffle/raffle" name="raffle.finished" template="raffle/finished.phtml" />
+        </reference>
+    </raffle_index_finished>
+	<checkout_onepage_success>
+        <reference name="checkout.success">
+            <block type="raffle/raffle" name="raffle.link" template="raffle/links.phtml"/>
+        </reference>
+    </checkout_onepage_success>
+</layout>

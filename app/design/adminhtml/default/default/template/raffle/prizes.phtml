@@ -1,0 +1,93 @@
+<?php if (!$this->getReadOnly()):?>
+<div class="entity-edit" id="matage-options-panel">
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo $this->__('Manage Rule') ?></h4>
+    </div>
+    <div class="box">
+        <div class="hor-scroll">
+            <table class="dynamic-grid" cellspacing="0"  cellpadding="0">
+                <tr id="attribute-options-table">
+                        <th><?php echo $this->__('Name') ?></th>
+                        <th><?php echo $this->__('Price') ?></th>
+                        <th><?php echo $this->__('Total') ?></th>
+                        <th>
+                            <?php if (!$this->getReadOnly()):?>
+                                    <button id="add_new_option_button" title="Add Option" type="button" class="scalable add" onclick="" style=""><span><span><span><?php echo $this->__('Add Option') ?></span></span></span></button>
+                            <?php endif;?>
+                        </th>
+                    </tr>
+            </table>
+        </div>
+        <input type="hidden" id="option-count-check" value="" />
+    </div>
+</div>
+<script type="text/javascript">
+//<![CDATA[
+var templateText =
+        '<tr class="option-row">'+
+            '<td><input class="input-text" type="text" name="option[name][{{id}}]" value="{{name}}" <?php if ($this->getReadOnly()):?> disabled="disabled"<?php endif;?>/><\/td>'+
+            '<td><input class="input-text" type="text" name="option[price][{{id}}]" value="{{price}}" <?php if ($this->getReadOnly()):?> disabled="disabled"<?php endif;?>/><\/td>'+
+            '<td><input class="input-text" type="text" name="option[total][{{id}}]" value="{{total}}" <?php if ($this->getReadOnly()):?> disabled="disabled"<?php endif;?>/><\/td>'+
+            '<td class="a-left" id="delete_button_container_{{id}}">'+
+                <?php if (!$this->getReadOnly()):?>
+                    '<button title="Delete" type="button" onclick="attributeOption.remove(this)" style=""><span><span><span>Delete</span></span></span></button>'
+                <?php endif;?>
+            '<\/td>'+
+        '<\/tr>';
+
+var attributeOption = {
+    table : $('attribute-options-table'),
+    templateSyntax : /(^|.|\r|\n)({{(\w+)}})/,
+    templateText : templateText,
+    itemCount : 0,
+    totalItems : 0,
+    add : function(data) {
+        this.template = new Template(this.templateText, this.templateSyntax);
+        if(!data.id){
+            data = {};
+            data.id  = 'option_'+this.itemCount;
+        }
+        Element.insert(this.table, {after: this.template.evaluate(data)});
+        this.itemCount++;
+        this.totalItems++;
+    },
+    remove : function(element){
+        element.up('tr').remove();
+        this.totalItems--;
+    }
+}
+if($('add_new_option_button')){
+    Event.observe('add_new_option_button', 'click', attributeOption.add.bind(attributeOption));
+}
+<?php foreach ($this->getRuleValues() as $_value): ?>
+    attributeOption.add({id:<?php echo $_value->getId() ?>,name:'<?php echo $_value->getName() ?>',price:'<?php echo $_value->getPrice() ?>',total:'<?php echo $_value->getTotal() ?>'});
+<?php endforeach; ?>
+//]]>
+</script>
+<?php else: ?>
+
+<div class="entity-edit" id="matage-options-panel">
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo $this->__('Manage Rule') ?></h4>
+    </div>
+    <div class="box">
+        <div class="hor-scroll">
+            <table class="dynamic-grid" cellspacing="0"  cellpadding="0">
+                    <tr id="attribute-options-table">
+                        <th><?php echo $this->__('Name') ?></th>
+                        <th><?php echo $this->__('Price') ?></th>
+                        <th><?php echo $this->__('Total') ?></th>
+                    </tr>
+                <?php foreach ($this->getRuleValues() as $_value): ?>
+                    <tr>
+                        <th><?php echo $_value->getName() ?></th>
+                        <th><?php echo $_value->getPrice() ?></th>
+                        <th><?php echo $_value->getRest() ?>/<?php echo $_value->getTotal() ?></th>
+                    </tr>
+                <?php endforeach; ?>
+            </table>
+        </div>
+    </div>
+</div>
+
+<?php endif; ?>

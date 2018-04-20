@@ -1,0 +1,19 @@
+<?php 
+	$tickets = $this->getCustomerTickets();
+?>
+<?php if($tickets&&$tickets->getSize()): ?>
+<h1><?php echo $this->__('My Tickets') ?></h1>
+<ul id="tickets">
+<?php foreach($tickets as $_ticket): ?>
+<?php $_ticket->setWinNumbers() ?>
+	<li class="row">
+		<ul class="ticket_row">
+			<?php $preFix = Mage::getModel('raffle/raffle')->load($_ticket->getRaffleId())->getData('raffle_prefix'); ?>
+			<?php for($i=$_ticket->getData('raffle_ticketnum_start');$i<=$_ticket->getData('raffle_ticketnum_end');$i++): ?>
+				<li><?php echo $preFix,' ',$i ?></li>
+			<?php endfor; ?>
+		</ul>
+	</li>
+<?php endforeach; ?>
+</ul>
+<?php endif; ?>

@@ -1,0 +1,28 @@
+<?php if($this->isRaffleProduct()): ?>
+<script>
+	document.observe('dom:loaded',function(){
+		<?php 
+			if(!Mage::getSingleton('customer/session')->isLoggedIn()){
+				?>
+				$$('.product-view button.btn-cart').each(function(el){
+					el.setAttribute('onclick', 'window.location.href="<?php echo $this->getUrl('customer/account/login') ?>"');
+					el.down('span span').update('Login To Purchase')
+				}); 
+				<?
+			}else{
+				?> 
+				$$('.product-view button.btn-cart span span').each(function(el){
+					el.update('Purchase Tickets');
+				});
+				<?php
+			}
+		?>
+        
+    });
+</script>
+<style>
+	.product-view .add-to-links {
+		display:none;
+	}
+</style>
+<?php endif; ?>

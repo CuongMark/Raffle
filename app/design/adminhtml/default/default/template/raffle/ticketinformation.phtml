@@ -1,0 +1,52 @@
+<?php $ticket = $this->getTicket() ?>
+<div id="ticket_tabs_form_section_content"><div class="entry-edit">
+<div class="entry-edit-head">
+    <h4 class="icon-head head-edit-form fieldset-legend">Raffle information</h4>
+    <div class="form-buttons"></div>
+</div>
+    <div class="fieldset " id="raffle_form">
+    <div class="hor-scroll">
+		<table cellspacing="0" class="form-list">
+            <tbody>
+                <tr>
+					<td class="label"><?php echo $this->__('Winner') ?>:</td>
+					<td class="value">
+						<?php 
+							$customerId = $ticket->getCustomerId();
+							$customer = Mage::getModel('customer/customer')->load($customerId);
+						?>
+						<a href="<?php echo Mage::helper("adminhtml")->getUrl('adminhtml/customer/edit',array('id'=>$customerId)) ?> " ><?php echo $customer->getFirstname(),' ',$customer->getMiddlename(),' ',$customer->getLastname() ?></a>
+					</td>
+				</tr>
+				<tr>
+					<td class="label"><?php echo $this->__('Order') ?>:</td>
+					<td class="value">
+						<?php 
+							$orderId = $ticket->getOrderId();
+							$order = Mage::getModel('sales/order')->load($orderId);
+						?>
+						<a href="<?php echo Mage::helper("adminhtml")->getUrl('adminhtml/sales_order/view',array('id'=>$orderId)) ?> " ><?php echo $order->getIncrementId() ?></a>
+					</td>
+				</tr>
+				<tr>
+					<td class="label"><?php echo $this->__('Win numbers') ?>:</td>
+					<td class="value">
+						<?php
+							$Winnumbers = $this->getWinnumbers();
+							$totalPrice = 0;
+						?>
+						<ul>
+						<?php foreach($Winnumbers as $_winnumber): ?>
+							<li><?php echo $_winnumber->getNumber() ?>: <?php echo Mage::helper('core')->currency($_winnumber->getPrice()) ?></li>
+							<?php $totalPrice += $_winnumber->getPrice(); ?>
+						<?php endforeach; ?>
+						</ul>
+						<span><?php echo $this->__('Total Price') ?>: <?php echo Mage::helper('core')->currency($totalPrice) ?></span>
+					</td>
+				</tr>
+            </tbody>
+        </table>
+	</div>
+	</div>
+</div>
+</div>

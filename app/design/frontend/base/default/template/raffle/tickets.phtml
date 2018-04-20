@@ -1,0 +1,83 @@
+<?php 
+	$tickets = $this->getCustomerTickets();
+?>
+<?php if($tickets&&$tickets->getSize()): ?>
+<h1><?php echo $this->__('Raffle Tickets') ?></h1>
+<ul id="tickets">
+<?php foreach($tickets as $_ticket): ?> 
+	<?php $raffle = Mage::getModel('raffle/raffle')->load($_ticket->getRaffleId()); ?>
+	<?php if($raffle->getId()): ?>
+        <?php $preFix = $raffle->getData('prefix'); ?>
+	<li class="row">
+		<h2 id="raffle_ticket_<?php echo $_ticket->getId() ?>"><?php echo $raffle->getData('name') ?></h2>
+		<?php if($_ticket->getStatus()==0): ?>
+                    <div class="check-box">
+                        <span class="checkticket_label"><?php echo $this->__('You purchased ticket number <div class="ticket_number">%s</div> through <div class="ticket_number">%s</div>', $preFix.$_ticket->getData('num_start'),$preFix.$_ticket->getData('num_end')) ?></span>
+                        <br>
+                        <button type="button" title="<?php echo $this->__('Check your tickets') ?>" class="button" onclick="checkTicket(<?php echo $_ticket->getId() ?>,'<?php echo $raffle->getData('raffle_prefix') ?>',this)"><span><span><?php echo $this->__('Check your tickets') ?></span></span></button>
+                    </div>
+		<?php elseif($_ticket->getStatus()==3): ?>
+                    <div class="check-box">
+                        <span class="checkticket_label"><?php echo $this->__('You purchased ticket number <div class="ticket_number">%s</div> through <div class="ticket_number">%s</div>', $preFix.' '.$_ticket->getData('num_start'),$preFix.' '.$_ticket->getData('num_end')) ?></span>
+                        <br>
+                        <span class="lost_notify"><?php echo $this->__('No winning tickets. Thank for your donation!') ?></span>
+                    </div>
+		<?php else: ?>
+                    <ul class="ticket_row">
+                        <?php $winNumbers = $_ticket->getWinNumbers(); ?>
+                        <?php $amount = 0; ?>
+                        <?php foreach($winNumbers as $_winNumber): ?>
+                            <li><?php echo $preFix,$_winNumber->getData('number') ?><div class="price"><?php echo Mage::helper('core')->currency($_winNumber->getData('price')) ?></div></li>
+							<?php $amount += $_winNumber->getData('price') ; ?>
+                        <?php endforeach; ?>
+                    </ul>
+            <script>
+                $('raffle_ticket_<?php echo $_ticket->getId() ?>').update('<?php echo $raffle->getData('name'),' - Total win ',Mage::helper('core')->currency($amount) ?>');
+            </script>
+		<?php endif; ?>
+	</li>
+	<?php endif; ?>
+<?php endforeach; ?>
+</ul>
+<div id="raffle_popup" style="display:none;"><ul class="ticket_row"></ul></div>
+<img id="raffle_winning" src="<?php echo $this->getSkinUrl('images/magestore/raffle/winner_opening_16940.gif',array('_secure'=>true)) ?>" class="winning" style="display:none;" />
+<img id="raffle_lose" src="<?php echo $this->getSkinUrl('images/magestore/raffle/again_primary_opening_16940.gif',array('_secure'=>true)) ?>" class="lose" style="display:none;" />
+<?php endif; ?>
+<script>
+	var popup = new MyDialog.Box('raffle_popup');
+	var raffle_winning = new MyDialog.Box('raffle_winning');
+	var raffle_lose = new MyDialog.Box('raffle_lose');
+	function checkTicket(ticket_id,preFix,element){
+		new Ajax.Request('<?php echo $this->getUrl('raffle/index/checkTicket',array('_secure'=>true)) ?>', {
+            method: 'post',
+            onFailure: "",
+			parameters: {id : ticket_id},
+            onComplete: function(xhr){
+                    if(xhr.responseText.isJSON()){
+                        var response = xhr.responseText.evalJSON();
+                        if(response.success){
+                        raffle_winning.show();
+                        setTimeout(function(){
+                                // popup.show();
+                                $('raffle_popup').update('<h2 style="color:red;text-align:center"><?php echo $this->__('Your Winning Tickets') ?></h2><ul class="ticket_row"></ul>');
+                                var ul = $$('#raffle_popup ul').first();
+                                response.numbers.each(function(el){
+                                        ul.insert({bottom:'<li>'+preFix+el+'</li>'});
+                                });
+                                element.up().outerHTML = ul.outerHTML;
+                                raffle_winning.hide();
+                                window.location.href = window.location.href;
+                                // popup.show();
+                            }, 3000);
+                        }else{
+                            raffle_lose.show();
+                            setTimeout(function(){
+                                raffle_lose.hide();
+                                window.location.href = window.location.href;
+                            }, 3000);
+                        }
+                    }
+            }
+        });
+	}
+</script>

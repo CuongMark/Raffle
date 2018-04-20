@@ -1,0 +1,34 @@
+<?php 
+	$tickets = $this->getCustomerTickets();
+?>
+<?php if($tickets&&$tickets->getSize()): ?>
+<h1><?php echo $this->__('My Tickets') ?></h1>
+<ul id="tickets">
+	<li>
+		<ul class="ticket_row">
+			<li><?php echo $this->__('Raffle Id') ?></li>
+			<li><?php echo $this->__('Start') ?></li>
+			<li><?php echo $this->__('End') ?></li>
+		</ul>
+	</li>
+<?php foreach($tickets as $_ticket): ?>
+<?php $_ticket->setWinNumbers() ?>
+	<li>
+		<ul class="ticket_row">
+			<li><?php echo $_ticket->getRaffleId() ?></li>
+			<li><?php echo $_ticket->getData('raffle_ticketnum_start') ?></li>
+			<li><?php echo $_ticket->getData('raffle_ticketnum_end') ?></li>
+			<li>
+				<button type="submit" title="check" class="button check_ticket_button" ticketId="<?php echo $_ticket->getId() ?>"><span><span><?php echo $this->__('check') ?></span></span></button>
+			</li>
+		</ul>
+	</li>
+<?php endforeach; ?>
+</ul>
+<?php endif; ?>
+<style>
+	ul.ticket_row li {
+		display: inline-block;
+		width: 24%;
+	}
+</style>

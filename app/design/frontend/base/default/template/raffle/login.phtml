@@ -1,0 +1,26 @@
+<script>
+	document.observe('dom:loaded',function(){
+		<?php 
+			if(!Mage::getSingleton('customer/session')->isLoggedIn()){
+				?>
+				$$('.raffle-index-index .product-info .actions button').each(function(el){
+					el.setAttribute('onclick', 'window.location.href="<?php echo $this->getUrl('customer/account/login') ?>"');
+					el.down('span span').update('Login To Purchase')
+				}); 
+				<?
+			}else{
+				?> 
+				$$('.raffle-index-index .product-info .actions button span span').each(function(el){
+					el.update('Purchase Tickets');
+				});
+				<?php
+			}
+		?>
+        
+    });
+</script>
+<style>
+	.category-products .add-to-links{
+		display:none;
+	}
+</style>

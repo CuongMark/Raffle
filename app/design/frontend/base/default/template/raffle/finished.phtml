@@ -1,0 +1,23 @@
+<div id="finnished_raffle">
+	<h1><?php echo $this->__('Finnished Raffle') ?></h1>
+	<?php $raffles = $this->getFinishedRaffle(); ?>
+	<?php foreach($raffles as $_raffle): ?>
+		<div class="raffle">
+			<h2><?php echo $_raffle->getName() ?></h2>
+			<?php $prizes = $_raffle->getRules() ?>
+			<?php $prefix = $_raffle->getPrefix() ?>
+			<ul class="prizes">
+			<?php foreach($prizes as $_prize): ?>
+				<li class="prize"><h3><?php echo $_prize->getName(),' - ',Mage::helper('core')->currency($_prize->getPrice()) ?></h3>
+				<?php $numbers = $_prize->getWinnumbers() ?>
+				<ul class="rand_numbers">
+				<?php foreach($numbers as $_number): ?>
+					<li><?php echo $prefix,$_number->getNumber() ?></li>
+				<?php endforeach; ?>
+				</ul>
+				</li>
+			<?php endforeach; ?>
+			</ul>
+		</div>
+	<?php endforeach; ?>
+</div>

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+	<raffleadmin_adminhtml_raffle_index>
+		<reference name="content">
+			<block type="raffle/adminhtml_raffle" name="raffle" />
+		</reference>
+	</raffleadmin_adminhtml_raffle_index>	<raffleadmin_adminhtml_tickets_index>
+		<reference name="content">
+			<block type="raffle/adminhtml_tickets" name="tickets" />
+		</reference>
+	</raffleadmin_adminhtml_tickets_index>
+</layout>

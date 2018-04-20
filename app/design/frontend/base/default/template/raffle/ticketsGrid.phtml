@@ -1,0 +1,94 @@
+<?php $status = Magestore_Raffle_Model_Tickets::status(); ?>
+<?php $tickets = $this->getCustomerTickets() ?>
+<div class="page-title">
+    <h1> <?php echo $this->__('Raffle Tickets')?></h1>
+</div>
+<div id="list-tickets">
+    <?php if(count($tickets)) : ?>
+        <?php echo $this->getChildHtml('pager'); ?>
+        <table cellspacing="0" cellpadding="0" class="data-table" id="list_customer_bids">
+            <thead>
+            <tr>
+                <th><?php echo $this->__('Name')?></th>
+                <th><?php echo $this->__('Order Number')?></th>
+                <th><?php echo $this->__('Start Number')?></th>
+                <th><?php echo $this->__('End Number')?></th>
+                <th><?php echo $this->__('Price')?></th>
+                <th><?php echo $this->__('Prize')?></th>
+                <th><?php echo $this->__('Purchased Time')?></th>
+                <th><?php echo $this->__('Status')?></th>
+                <th><?php echo $this->__('Action')?></th>
+            </tr>
+            </thead>
+            <?php foreach($tickets as $item): ?>
+                <?php $create_time =  new Zend_Date($item->getCreatedTime(),null,'en_GB') ?>
+                <tr>
+                    <td><a href="<?php echo Mage::getModel('catalog/product')->load($item->getData('product_id'))->getProductUrl() ?>"><?php echo $item->getData('name') ?></a></td>
+                    <td><a href="<?php echo $this->getUrl('sales/order/view',array('order_id'=>$item->getData('order_id'))) ?>"><?php echo $item->getData('increment_id') ?></a></td>
+                    <td><?php echo $item->getNumStart() ?></td>
+                    <td><?php echo $item->getNumEnd() ?></td>
+                    <td><?php echo Mage::helper('core')->currency($item->getData('price')) ?></td>
+                    <td>
+                        <?php if($item->isChecked()): ?>
+                        <?php $amount = 0; ?>
+                        <?php $winNumbers = $item->getWinNumbers(); ?>
+                        <?php foreach($winNumbers as $_winNumber): ?>
+                            <?php $amount += $_winNumber->getData('price') ; ?>
+                        <?php endforeach; ?>
+                        <?php echo Mage::helper('core')->currency($amount) ?>
+                        <?php endif; ?>
+                    </td>
+                    <td><?php echo $this->formatDate($create_time,'medium',true) ?></td>
+                    <td><?php echo $status[$item->getStatus()] ?></td>
+                    <td><?php if($item->isChecked()): ?>
+                        <button type="button" title="<?php echo $this->__('Check your tickets') ?>" class="button" onclick="checkTicket(<?php echo $item->getId() ?>,'<?php echo $item->getData('raffle_prefix') ?>',this)"><span><span><?php echo $this->__('Check your tickets') ?></span></span></button><?php endif; ?>
+                    </td>
+                </tr>	<?php endforeach; ?>
+        </table>
+        <?php echo $this->getChildHtml('pager'); ?>
+    <?php else : ?>	<br/>
+        <div class="note-msg"><p><?php echo $this->__('You don\'t have any tickets') ?>.</p>	</div><br/>	<?php endif; ?></div>
+<div class="button-set">	<a class="left" href="javascript:history.go(-1);"> <?php echo $this->__('Back') ?></a></div>
+
+
+<div id="raffle_popup" style="display:none;"><ul class="ticket_row"></ul></div>
+<img id="raffle_winning" src="<?php echo $this->getSkinUrl('images/magestore/raffle/winner_opening_16940.gif',array('_secure'=>true)) ?>" class="winning" style="display:none;" />
+<img id="raffle_lose" src="<?php echo $this->getSkinUrl('images/magestore/raffle/again_primary_opening_16940.gif',array('_secure'=>true)) ?>" class="lose" style="display:none;" />
+<script>
+    var popup = new MyDialog.Box('raffle_popup');
+    var raffle_winning = new MyDialog.Box('raffle_winning');
+    var raffle_lose = new MyDialog.Box('raffle_lose');
+    function checkTicket(ticket_id,preFix,element){
+        new Ajax.Request('<?php echo $this->getUrl('raffle/index/checkTicket',array('_secure'=>true)) ?>', {
+            method: 'post',
+            onFailure: "",
+            parameters: {id : ticket_id},
+            onComplete: function(xhr){
+                if(xhr.responseText.isJSON()){
+                    var response = xhr.responseText.evalJSON();
+                    if(response.success){
+                        raffle_winning.show();
+                        setTimeout(function(){
+                            // popup.show();
+                            $('raffle_popup').update('<h2 style="color:red;text-align:center"><?php echo $this->__('Your Winning Tickets') ?></h2><ul class="ticket_row"></ul>');
+                            var ul = $$('#raffle_popup ul').first();
+                            response.numbers.each(function(el){
+                                ul.insert({bottom:'<li>'+preFix+el+'</li>'});
+                            });
+                            element.up().outerHTML = ul.outerHTML;
+                            raffle_winning.hide();
+                            window.location.href = window.location.href;
+                            // popup.show();
+                        }, 3000);
+                    }else{
+                        raffle_lose.show();
+                        setTimeout(function(){
+                            raffle_lose.hide();
+                            window.location.href = window.location.href;
+                        }, 3000);
+                    }
+                }
+            }
+        });
+    }
+</script>
